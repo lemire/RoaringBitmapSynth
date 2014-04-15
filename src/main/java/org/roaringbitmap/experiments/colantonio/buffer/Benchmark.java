@@ -1,4 +1,4 @@
-package org.roaringbitmap.experiments.colantonio;
+package org.roaringbitmap.experiments.colantonio.buffer;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.BitSet;
 import java.util.Locale;
 
 import org.roaringbitmap.RoaringBitmap;
+import org.roaringbitmap.experiments.colantonio.DataGenerator;
 
 import net.sourceforge.sizeof.SizeOf;
 import it.uniroma3.mat.extendedset.intset.ConciseSet;
@@ -74,6 +75,18 @@ public class Benchmark {
         /**
          * @param a
          *                an array of integers
+         * @return a RoaringBitmap representing the provided integers
+         */
+        public static org.roaringbitmap.buffer.RoaringBitmap toBufferedRoaringBitmap(int[] a) {
+        	org.roaringbitmap.buffer.RoaringBitmap rr = new org.roaringbitmap.buffer.RoaringBitmap();
+                for (int x : a)
+                        rr.add(x);
+                return rr;
+        }
+
+        /**
+         * @param a
+         *                an array of integers
          * @return a ConciseSet (in WAH mode) representing the provided integers
          */
         public static ConciseSet toWAHConciseSet(int[] a) {
@@ -118,7 +131,7 @@ public class Benchmark {
                                 .println("# disabling sizeOf, run  -javaagent:lib/SizeOf.jar or equiv. to enable");
                 }
                 DataGenerator gen = new DataGenerator(N);
-                int TIMES = 100;
+                int TIMES = 3;//00;
                 gen.setUniform();
                 test(gen, false, TIMES, sizeof);
                 test(gen, true, TIMES, sizeof);
@@ -162,23 +175,23 @@ public class Benchmark {
                                 .println("# For size (last columns), first column is estimated, second is sizeof");
                 if (verbose)
                         System.out
-                                .print("# density\tbitset\t\tconcise\t\twah\t\troar"
-                                        + "\t\t\tbitset\t\tconcise\t\twah\t\troaring"
-                                        + "\t\t\tbitset\t\tconcise\t\twah\t\troaring");
+                                .print("# density\tbitset\t\tconcise\t\twah\t\troaring\t\tbroaring"
+                                        + "\t\t\tbitset\t\tconcise\t\twah\t\troaring\t\tbroaring"
+                                        + "\t\t\tbitset\t\tconcise\t\twah\t\troaring\t\tbroaring");
                 if (verbose)
                         if (sizeof)
                                 System.out
-                                        .println("\t\tbitset\tbitset\tconcise\tconcise\twah\twah\troar\troar");
+                                        .println("\t\tbitset\tbitset\tconcise\tconcise\twah\twah\troar\troar\tbroar\tbroar");
                         else
                                 System.out
                                         .println("\t\tbitset\t\tconcise\t\twah\t\troar");
                 for (double d = 0.0009765625; d <= 1.000; d *= 2) {
-                        double[] timings = new double[4];
-                        double[] unions = new double[4];
-                        double[] storageinbits = new double[4];
-                        double[] truestorageinbits = new double[4];
-                        double[] appendTimes = new double[4];
-                        double[] removeTimes = new double[4];
+                        double[] timings = new double[5];
+                        double[] unions = new double[5];
+                        double[] storageinbits = new double[5];
+                        double[] truestorageinbits = new double[5];
+                        double[] appendTimes = new double[5];
+                        double[] removeTimes = new double[5];
 
                         for (int times = 0; times < TIMES; ++times) {
                                 int[] v1 = gen.getRandomArray(d);
@@ -385,6 +398,58 @@ public class Benchmark {
                                 rb2 = null;
                                 rb1i = null;
                                 rb1u = null;
+
+                                // org.roaringbitmap.buffer.RoaringBitmap
+                                // Append times
+                                bef = System.nanoTime();
+                                org.roaringbitmap.buffer.RoaringBitmap brb1 = toBufferedRoaringBitmap(v1);
+                                aft = System.nanoTime();
+                                bogus += brb1.getCardinality();
+                                appendTimes[4] += aft - bef;
+                                org.roaringbitmap.buffer.RoaringBitmap brb2 = toBufferedRoaringBitmap(v2);
+                                // Storage
+                                storageinbits[4] += brb1.getSizeInBytes() * 8;
+                                storageinbits[4] += brb2.getSizeInBytes() * 8;
+                                if (sizeof)
+                                        truestorageinbits[4] += SizeOf
+                                                .deepSizeOf(brb1)
+                                                * 8
+                                                + SizeOf.deepSizeOf(brb2) * 2;
+                                // Intersect times
+                                bef = System.nanoTime();
+                                org.roaringbitmap.buffer.RoaringBitmap brb1i = org.roaringbitmap.buffer.RoaringBitmap
+                                        .and(brb1, brb2);
+                                aft = System.nanoTime();
+                                // we verify the answer
+                                if(!verbose) if (!Arrays.equals(brb1i.toArray(),
+                                        trueintersection))
+                                        throw new RuntimeException("bug");
+                                bogus += brb1i.getCardinality();
+                                timings[4] += aft - bef;
+                                // Union times
+                                bef = System.nanoTime();
+                                org.roaringbitmap.buffer.RoaringBitmap brb1u = org.roaringbitmap.buffer.RoaringBitmap.or(brb1, brb2);
+                                aft = System.nanoTime();
+                                // we verify the answer
+                                if(!verbose) if (!Arrays.equals(brb1u.toArray(), trueunion))
+                                        throw new RuntimeException("bug");
+                                bogus += brb1u.getCardinality();
+                                unions[4] += aft - bef;
+                                // Remove times
+                                bef = System.nanoTime();
+                                brb2.remove(toRemove);
+                                aft = System.nanoTime();
+                                if(!verbose) if (!Arrays
+                                        .equals(brb2.toArray(), b2withremoval))
+                                        throw new RuntimeException("bug");
+                                removeTimes[4] += aft - bef;
+                                bogus += brb1.getCardinality();
+                                brb1 = null;
+                                brb2 = null;
+                                brb1i = null;
+                                brb1u = null;
+
+                        
                         }
                         if (verbose) {
                                 System.out.print(df.format(d) + "\t"
@@ -394,7 +459,9 @@ public class Benchmark {
                                         + "\t\t"
                                         + df.format(timings[2] / TIMES)
                                         + "\t\t"
-                                        + df.format(timings[3] / TIMES));
+                                        + df.format(timings[3] / TIMES)
+                                        + "\t\t"
+                                        + df.format(timings[4] / TIMES));
                                 System.out.print("\t\t\t"
                                         + df.format(appendTimes[0]
                                                 / (TIMES * gen.N))
@@ -406,6 +473,9 @@ public class Benchmark {
                                                 / (TIMES * gen.N))
                                         + "\t\t"
                                         + df.format(appendTimes[3]
+                                                / (TIMES * gen.N))
+                                        + "\t\t"
+                                        + df.format(appendTimes[4]
                                                 / (TIMES * gen.N)));
                                 System.out.print("\t\t\t\t"
                                         + df.format(removeTimes[0] / TIMES)
@@ -414,7 +484,9 @@ public class Benchmark {
                                         + "\t\t"
                                         + df.format(removeTimes[2] / TIMES)
                                         + "\t\t"
-                                        + df.format(removeTimes[3] / TIMES));
+                                        + df.format(removeTimes[3] / TIMES)
+                                        + "\t\t"
+                                        + df.format(removeTimes[4] / TIMES));
                         }
                         if (verbose)
                                 if (sizeof)
@@ -442,6 +514,12 @@ public class Benchmark {
                                                                 / (2 * TIMES * gen.N))
                                                         + "\t"
                                                         + dfb.format(truestorageinbits[3]
+                                                                / (2 * TIMES * gen.N))
+                                                        + "\t"
+                                                        + dfb.format(storageinbits[4]
+                                                                / (2 * TIMES * gen.N))
+                                                        + "\t"
+                                                        + dfb.format(truestorageinbits[4]
                                                                 / (2 * TIMES * gen.N)));
                                 else
                                         System.out.print("\t\t\t"
@@ -455,13 +533,17 @@ public class Benchmark {
                                                         / (2 * TIMES * gen.N))
                                                 + "\t\t"
                                                 + dfb.format(storageinbits[3]
+                                                        / (2 * TIMES * gen.N))
+                                                + "\t\t"
+                                                + dfb.format(storageinbits[4]
                                                         / (2 * TIMES * gen.N)));
                         if (verbose)
                                 System.out.print("\t\t\t"
                                         + df.format(unions[0] / TIMES) + "\t\t"
                                         + df.format(unions[1] / TIMES) + "\t\t"
                                         + df.format(unions[2] / TIMES) + "\t\t"
-                                        + df.format(unions[3] / TIMES));
+                                        + df.format(unions[3] / TIMES) + "\t\t"
+                                        + df.format(unions[4] / TIMES));
                         if(verbose) System.out.println();
                 }
                 System.out.println("#ignore = " + bogus);

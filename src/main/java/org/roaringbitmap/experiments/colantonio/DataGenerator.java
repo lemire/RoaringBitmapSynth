@@ -12,8 +12,8 @@ import java.util.Random;
  *
  */
 public class DataGenerator {
-        Random rand = new Random();
-        int N;
+        public Random rand = new Random();
+        public int N;
         boolean zipfian = false;
 
         /**
