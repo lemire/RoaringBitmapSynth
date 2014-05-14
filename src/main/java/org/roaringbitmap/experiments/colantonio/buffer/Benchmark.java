@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Locale;
 
+import org.roaringbitmap.buffer.*;
 import org.roaringbitmap.RoaringBitmap;
 import org.roaringbitmap.experiments.colantonio.DataGenerator;
 
@@ -77,8 +78,8 @@ public class Benchmark {
          *                an array of integers
          * @return a RoaringBitmap representing the provided integers
          */
-        public static org.roaringbitmap.buffer.RoaringBitmap toBufferedRoaringBitmap(int[] a) {
-        	org.roaringbitmap.buffer.RoaringBitmap rr = new org.roaringbitmap.buffer.RoaringBitmap();
+        public static MappeableRoaringBitmap toBufferedRoaringBitmap(int[] a) {
+        	MappeableRoaringBitmap rr = new MappeableRoaringBitmap();
                 for (int x : a)
                         rr.add(x);
                 return rr;
@@ -399,14 +400,14 @@ public class Benchmark {
                                 rb1i = null;
                                 rb1u = null;
 
-                                // org.roaringbitmap.buffer.RoaringBitmap
+                                // MappeableRoaringBitmap
                                 // Append times
                                 bef = System.nanoTime();
-                                org.roaringbitmap.buffer.RoaringBitmap brb1 = toBufferedRoaringBitmap(v1);
+                                MappeableRoaringBitmap brb1 = toBufferedRoaringBitmap(v1);
                                 aft = System.nanoTime();
                                 bogus += brb1.getCardinality();
                                 appendTimes[4] += aft - bef;
-                                org.roaringbitmap.buffer.RoaringBitmap brb2 = toBufferedRoaringBitmap(v2);
+                                MappeableRoaringBitmap brb2 = toBufferedRoaringBitmap(v2);
                                 // Storage
                                 storageinbits[4] += brb1.getSizeInBytes() * 8;
                                 storageinbits[4] += brb2.getSizeInBytes() * 8;
@@ -417,7 +418,7 @@ public class Benchmark {
                                                 + SizeOf.deepSizeOf(brb2) * 2;
                                 // Intersect times
                                 bef = System.nanoTime();
-                                org.roaringbitmap.buffer.RoaringBitmap brb1i = org.roaringbitmap.buffer.RoaringBitmap
+                                MappeableRoaringBitmap brb1i = MappeableRoaringBitmap
                                         .and(brb1, brb2);
                                 aft = System.nanoTime();
                                 // we verify the answer
@@ -428,7 +429,7 @@ public class Benchmark {
                                 timings[4] += aft - bef;
                                 // Union times
                                 bef = System.nanoTime();
-                                org.roaringbitmap.buffer.RoaringBitmap brb1u = org.roaringbitmap.buffer.RoaringBitmap.or(brb1, brb2);
+                                MappeableRoaringBitmap brb1u = MappeableRoaringBitmap.or(brb1, brb2);
                                 aft = System.nanoTime();
                                 // we verify the answer
                                 if(!verbose) if (!Arrays.equals(brb1u.toArray(), trueunion))
