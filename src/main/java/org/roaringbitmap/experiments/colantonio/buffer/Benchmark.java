@@ -78,8 +78,8 @@ public class Benchmark {
          *                an array of integers
          * @return a RoaringBitmap representing the provided integers
          */
-        public static MappeableRoaringBitmap toBufferedRoaringBitmap(int[] a) {
-        	MappeableRoaringBitmap rr = new MappeableRoaringBitmap();
+        public static MutableRoaringBitmap toBufferedRoaringBitmap(int[] a) {
+        	MutableRoaringBitmap rr = new MutableRoaringBitmap();
                 for (int x : a)
                         rr.add(x);
                 return rr;
@@ -400,14 +400,14 @@ public class Benchmark {
                                 rb1i = null;
                                 rb1u = null;
 
-                                // MappeableRoaringBitmap
+                                // MutableRoaringBitmap
                                 // Append times
                                 bef = System.nanoTime();
-                                MappeableRoaringBitmap brb1 = toBufferedRoaringBitmap(v1);
+                                MutableRoaringBitmap brb1 = toBufferedRoaringBitmap(v1);
                                 aft = System.nanoTime();
                                 bogus += brb1.getCardinality();
                                 appendTimes[4] += aft - bef;
-                                MappeableRoaringBitmap brb2 = toBufferedRoaringBitmap(v2);
+                                MutableRoaringBitmap brb2 = toBufferedRoaringBitmap(v2);
                                 // Storage
                                 storageinbits[4] += brb1.getSizeInBytes() * 8;
                                 storageinbits[4] += brb2.getSizeInBytes() * 8;
@@ -418,7 +418,7 @@ public class Benchmark {
                                                 + SizeOf.deepSizeOf(brb2) * 2;
                                 // Intersect times
                                 bef = System.nanoTime();
-                                MappeableRoaringBitmap brb1i = MappeableRoaringBitmap
+                                MutableRoaringBitmap brb1i = MutableRoaringBitmap
                                         .and(brb1, brb2);
                                 aft = System.nanoTime();
                                 // we verify the answer
@@ -429,7 +429,7 @@ public class Benchmark {
                                 timings[4] += aft - bef;
                                 // Union times
                                 bef = System.nanoTime();
-                                MappeableRoaringBitmap brb1u = MappeableRoaringBitmap.or(brb1, brb2);
+                                MutableRoaringBitmap brb1u = MutableRoaringBitmap.or(brb1, brb2);
                                 aft = System.nanoTime();
                                 // we verify the answer
                                 if(!verbose) if (!Arrays.equals(brb1u.toArray(), trueunion))

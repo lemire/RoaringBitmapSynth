@@ -30,12 +30,11 @@
 	</dependencyManagement>
 	<dependencies>
 
-<dependency>
-  <groupId>org.roaringbitmap</groupId>
-  <artifactId>RoaringBitmap</artifactId>
-  <version>0.2.2</version>
-</dependency>
-
+    <dependency>
+      <groupId>org.roaringbitmap</groupId>
+      <artifactId>RoaringBitmap</artifactId>
+      <version>0.3.4</version>
+    </dependency>
 
 <dependency>
     <artifactId>ConciseSet</artifactId>
