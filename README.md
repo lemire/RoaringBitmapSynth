@@ -13,7 +13,7 @@ Usage
 
 * install java
 * install maven 2
-* type maven package
+* type mvn package
 * cd target
 * java -cp RoaringBitmapSynth-0.0.1-SNAPSHOT.jar:lib/* org.roaringbitmap.experiments.colantonio.Benchmark
-
+* java -cp RoaringBitmapSynth-0.0.1-SNAPSHOT.jar:lib/* -javaagent:lib/SizeOf.jar org.roaringbitmap.experiments.colantonio.buffer.MemoryUsage
