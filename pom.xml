@@ -33,7 +33,9 @@
 <dependency>
   <groupId>org.roaringbitmap</groupId>
   <artifactId>RoaringBitmap</artifactId>
-  <version>0.2.2</version>
+  <version>0.4.8</version>
+  <scope>system</scope>
+  <systemPath>${basedir}/lib/RoaringBitmap-0.4.8.jar</systemPath>
 </dependency>
 
 

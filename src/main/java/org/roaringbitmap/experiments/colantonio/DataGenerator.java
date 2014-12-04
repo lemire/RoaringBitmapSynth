@@ -140,7 +140,6 @@ public class DataGenerator {
                 Arrays.sort(answer);
                 return answer;
         }
-
 }
 
 
