@@ -147,31 +147,6 @@ public class Benchmark {
                 if (!verbose)
                         System.out
                                 .println("# running a dry run (can take a long time)");
-               
-                if (verbose)
-                        if (gen.is_zipfian())
-                                System.out.println("### zipfian test");
-                        else
-                                System.out.println("### uniform test");
-                if (verbose)
-                        System.out
-                                .println("# first columns are timings [intersection times in ns], then append times in ns, "
-                                        + "then removes times in ns, then bits/int, then union times");
-                if (verbose && sizeof)
-                        System.out
-                                .println("# For size (last columns), first column is estimated, second is sizeof");
-                if (verbose)
-                        System.out
-                                .print("# density\tbitset\t\tconcise\t\twah\t\troar"
-                                        + "\t\t\tbitset\t\tconcise\t\twah\t\troaring"
-                                        + "\t\t\tbitset\t\tconcise\t\twah\t\troaring");
-                if (verbose)
-                        if (sizeof)
-                                System.out
-                                        .println("\t\tbitset\tbitset\tconcise\tconcise\twah\twah\troar\troar");
-                        else
-                                System.out
-                                        .println("\t\tbitset\t\tconcise\t\twah\t\troar");
                 
                 if(!verbose) {
                 	int[] seuils = {1};
@@ -189,7 +164,34 @@ public class Benchmark {
          DecimalFormat df = new DecimalFormat("0.000E0");
          DecimalFormat dfb = new DecimalFormat("000.0");
         for(int seuil=0; seuil<seuils.length; seuil++) {
+        	
         	if(verbose) System.out.println("\nRoaring bitmap/array conversion threshold = "+seuils[seuil]+"\n");
+        	
+        	if (verbose)
+                if (gen.is_zipfian())
+                        System.out.println("### zipfian test");
+                else
+                        System.out.println("### uniform test");
+        if (verbose)
+                System.out
+                        .println("# first columns are timings [intersection times in ns], then append times in ns, "
+                                + "then removes times in ns, then bits/int, then union times");
+        if (verbose && sizeof)
+                System.out
+                        .println("# For size (last columns), first column is estimated, second is sizeof");
+        if (verbose)
+                System.out
+                        .print("# density\tbitset\t\tconcise\t\twah\t\troar"
+                                + "\t\t\tbitset\t\tconcise\t\twah\t\troaring"
+                                + "\t\t\tbitset\t\tconcise\t\twah\t\troaring");
+        if (verbose)
+                if (sizeof)
+                        System.out
+                                .println("\t\tbitset\tbitset\tconcise\tconcise\twah\twah\troar\troar");
+                else
+                        System.out
+                                .println("\t\tbitset\t\tconcise\t\twah\t\troar");
+        	
         	for (double d = 0.0009765625; d <= 1.000; d *= 2) {
                 double[] timings = new double[4];
                 double[] unions = new double[4];
