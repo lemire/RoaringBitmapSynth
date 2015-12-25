@@ -215,10 +215,9 @@ public class Benchmark {
                         // Storage
                         storageinbits[0] += borig1.size() + b2.size();
                         if (sizeof)
-                                truestorageinbits[0] += SizeOf
-                                        .deepSizeOf(borig1)
-                                        * 8
-                                        + SizeOf.deepSizeOf(b2) * 2;
+                                truestorageinbits[0] += (SizeOf
+                                        .deepSizeOf(borig1)                                        
+                                        + SizeOf.deepSizeOf(b2)) * 8;
                         // And times.
                         bef = System.nanoTime();
                         BitSet b1 = (BitSet) borig1.clone(); // for fair
@@ -269,10 +268,9 @@ public class Benchmark {
                                 * cs2.collectionCompressionRatio() * 4
                                 * 8;
                         if (sizeof)
-                                truestorageinbits[1] += SizeOf
+                                truestorageinbits[1] += (SizeOf
                                         .deepSizeOf(cs1)
-                                        * 8
-                                        + SizeOf.deepSizeOf(cs2) * 2;
+                                        + SizeOf.deepSizeOf(cs2)) * 8;
                         bef = System.nanoTime();
                         ConciseSet cs1i = cs1.intersection(cs2);
                         aft = System.nanoTime();
@@ -320,10 +318,9 @@ public class Benchmark {
                                 * wah2.collectionCompressionRatio() * 4
                                 * 8;
                         if (sizeof)
-                                truestorageinbits[2] += SizeOf
+                                truestorageinbits[2] += (SizeOf
                                         .deepSizeOf(wah1)
-                                        * 8
-                                        + SizeOf.deepSizeOf(wah2) * 2;
+                                        + SizeOf.deepSizeOf(wah2)) * 8;
                         // Intersect times
                         bef = System.nanoTime();
                         ConciseSet wah1i = wah1.intersection(wah2);
@@ -369,10 +366,9 @@ public class Benchmark {
                         storageinbits[3] += rb1.getSizeInBytes() * 8;
                         storageinbits[3] += rb2.getSizeInBytes() * 8;
                         if (sizeof)
-                                truestorageinbits[3] += SizeOf
+                                truestorageinbits[3] += (SizeOf
                                         .deepSizeOf(rb1)
-                                        * 8
-                                        + SizeOf.deepSizeOf(rb2) * 2;
+                                        + SizeOf.deepSizeOf(rb2)) * 8;
                         // Intersect times
                         bef = System.nanoTime();
                         RoaringBitmap rb1i = RoaringBitmap
